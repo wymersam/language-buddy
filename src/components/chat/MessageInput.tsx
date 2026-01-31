@@ -44,8 +44,8 @@ const MessageInput: React.FC<MessageInputProps> = ({
       {showToggleFeedback && (
         <div className="toggle-feedback">
           {user.generateExercises
-            ? "💬 Switched to chat only"
-            : "🎯 Exercises enabled"}
+            ? "Exercises enabled"
+            : "Switched to chat only"}
         </div>
       )}
 

@@ -123,6 +123,7 @@ export default function ChatInterface({
         <MessagesList
           messages={currentSession.messages}
           isTyping={isTyping}
+          userAvatar={user.avatar}
           ref={messagesEndRef}
         />
       )}

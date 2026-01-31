@@ -6,6 +6,7 @@ export interface User {
   nativeLanguage: string;
   responseLanguage: "bilingual" | "german-only";
   generateExercises: boolean;
+  avatar?: string; // Base64 encoded image data
 }
 
 export interface Message {

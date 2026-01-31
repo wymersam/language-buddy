@@ -3,12 +3,20 @@ import type { MessagesListProps } from "../../types";
 import MessageItem from "./MessageItem";
 import TypingIndicator from "./TypingIndicator";
 
-const MessagesList = forwardRef<HTMLDivElement, MessagesListProps>(
-  ({ messages, isTyping }, ref) => {
+interface MessagesListPropsExtended extends MessagesListProps {
+  userAvatar?: string;
+}
+
+const MessagesList = forwardRef<HTMLDivElement, MessagesListPropsExtended>(
+  ({ messages, isTyping, userAvatar }, ref) => {
     return (
       <div className="messages-container">
         {messages.map((message) => (
-          <MessageItem key={message.id} message={message} />
+          <MessageItem
+            key={message.id}
+            message={message}
+            userAvatar={userAvatar}
+          />
         ))}
 
         {isTyping && <TypingIndicator />}

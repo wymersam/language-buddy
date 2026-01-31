@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { User, Edit2, Save, Trash2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { User, Edit2, Save, Trash2, Camera } from "lucide-react";
 import type { User as UserType } from "../../types";
 import { clearAllData } from "../../utils/storage";
 
@@ -11,6 +11,7 @@ interface ProfileViewProps {
 export default function ProfileView({ user, setUser }: ProfileViewProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSave = () => {
     setUser(editedUser);
@@ -31,6 +32,40 @@ export default function ProfileView({ user, setUser }: ProfileViewProps) {
       clearAllData();
       window.location.reload();
     }
+  };
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check file size (limit to 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size too large. Please choose an image under 5MB.");
+        return;
+      }
+
+      // Check file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please select a valid image file.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64String = e.target?.result as string;
+        setEditedUser({ ...editedUser, avatar: base64String });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setEditedUser({ ...editedUser, avatar: undefined });
   };
 
   return (
@@ -59,8 +94,43 @@ export default function ProfileView({ user, setUser }: ProfileViewProps) {
 
       <div className="profile-content">
         <div className="profile-section avatar-section">
-          <div className="avatar">
-            <User size={60} className="text-white" />
+          <div className="avatar-container">
+            <div
+              className={`avatar ${isEditing ? "avatar-editable" : ""}`}
+              onClick={handleAvatarClick}
+            >
+              {(isEditing ? editedUser.avatar : user.avatar) ? (
+                <img
+                  src={isEditing ? editedUser.avatar : user.avatar}
+                  alt="Profile avatar"
+                  className="avatar-image"
+                />
+              ) : (
+                <User size={60} className="text-white" />
+              )}
+              {isEditing && (
+                <div className="avatar-overlay">
+                  <Camera size={24} className="text-white" />
+                  <span className="avatar-text">Change Photo</span>
+                </div>
+              )}
+            </div>
+            {isEditing && (editedUser.avatar || user.avatar) && (
+              <button
+                onClick={handleRemoveAvatar}
+                className="remove-avatar-button"
+                type="button"
+              >
+                Remove Photo
+              </button>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleAvatarChange}
+              style={{ display: "none" }}
+            />
           </div>
           {isEditing ? (
             <input
