@@ -13,7 +13,6 @@ const WelcomeMessage: React.FC = () => {
           Start chatting with me in English or German! I'll help you learn by
           creating personalized exercises based on our conversations.
         </p>
-        <div className="welcome-badge">✨ AI-powered learning</div>
       </div>
     </div>
   );

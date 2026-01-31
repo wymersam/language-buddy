@@ -9,8 +9,9 @@ import MessageInput from "./MessageInput";
 interface ChatInterfaceProps {
   user: User;
   currentSession: ChatSession | null;
-  setCurrentSession: (session: ChatSession) => void;
+  setCurrentSession: (session: ChatSession | null) => void;
   onNewExercises?: (exercises: Exercise[]) => void;
+  onUserUpdate?: (user: User) => void;
 }
 
 export default function ChatInterface({
@@ -18,6 +19,7 @@ export default function ChatInterface({
   currentSession,
   setCurrentSession,
   onNewExercises,
+  onUserUpdate,
 }: ChatInterfaceProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -28,6 +30,15 @@ export default function ChatInterface({
   };
 
   useEffect(scrollToBottom, [currentSession?.messages]);
+
+  const toggleExerciseGeneration = () => {
+    if (onUserUpdate) {
+      onUserUpdate({
+        ...user,
+        generateExercises: !user.generateExercises,
+      });
+    }
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -64,6 +75,7 @@ export default function ChatInterface({
           userMessage.content,
           user,
           currentSession?.messages || [],
+          false, // Don't force exercises in chat - let natural conversation trigger them
         );
 
         const botMessage: Message = {
@@ -122,6 +134,8 @@ export default function ChatInterface({
         onSendMessage={handleSendMessage}
         onKeyPress={handleKeyPress}
         isTyping={isTyping}
+        user={user}
+        onToggleExercises={toggleExerciseGeneration}
       />
     </div>
   );

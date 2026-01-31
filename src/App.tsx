@@ -21,9 +21,8 @@ const initialUser: User = {
   level: "A1",
   targetLanguage: "German",
   nativeLanguage: "English",
-  weakAreas: ["adjective endings", "der/die/das articles"],
-  strengths: ["basic vocabulary", "present tense"],
   responseLanguage: "bilingual",
+  generateExercises: true,
 };
 
 export default function App() {
@@ -35,6 +34,7 @@ export default function App() {
     loadCurrentSession(),
   );
   const [exercises, setExercises] = useState<Exercise[]>(() => loadExercises());
+  const [isGeneratingExercises, setIsGeneratingExercises] = useState(false);
 
   // Save user data when it changes
   useEffect(() => {
@@ -53,6 +53,40 @@ export default function App() {
     saveExercises(exercises);
   }, [exercises]);
 
+  const handleMoreExercises = async () => {
+    setIsGeneratingExercises(true);
+    console.log("🔄 Generating new exercises...");
+
+    try {
+      // Generate new exercises based on user's overall interaction
+      const { generateBotResponse } = await import("./utils/chatbot");
+      const genericPrompt = `Please create new practice exercises for me to help me learn German. Mix different types of exercises.`;
+
+      const result = await generateBotResponse(
+        genericPrompt,
+        user,
+        currentSession?.messages || [], // Include conversation history
+        true, // Force exercise generation
+      );
+
+      console.log("✅ Generated exercises:", result.exercises);
+
+      if (result.exercises && result.exercises.length > 0) {
+        setExercises(result.exercises);
+        console.log("📝 Updated exercises state");
+        // Force re-render by updating key or triggering reset
+        setActiveTab("exercises"); // This will re-mount the component
+        console.log("🏠 Set active tab to exercises");
+      } else {
+        console.log("❌ No exercises generated");
+      }
+    } catch (error) {
+      console.error("Failed to generate new exercises:", error);
+    } finally {
+      setIsGeneratingExercises(false);
+    }
+  };
+
   const handleNewExercises = (newExercises: Exercise[]) => {
     setExercises(newExercises);
     // Auto-switch to exercises tab when new exercises are generated
@@ -61,6 +95,7 @@ export default function App() {
 
   const handleUserUpdate = (updatedUser: User) => {
     setUser(updatedUser);
+    saveUser(updatedUser);
   };
 
   return (
@@ -83,6 +118,7 @@ export default function App() {
             currentSession={currentSession}
             setCurrentSession={setCurrentSession}
             onNewExercises={handleNewExercises}
+            onUserUpdate={handleUserUpdate}
           />
         )}
 
@@ -90,7 +126,13 @@ export default function App() {
           <ProfileView user={user} setUser={handleUserUpdate} />
         )}
 
-        {activeTab === "exercises" && <ExerciseView exercises={exercises} />}
+        {activeTab === "exercises" && (
+          <ExerciseView
+            exercises={exercises}
+            onNewExercises={handleMoreExercises}
+            isGeneratingExercises={isGeneratingExercises}
+          />
+        )}
       </main>
 
       <nav className="bottom-nav">

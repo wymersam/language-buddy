@@ -1,19 +1,18 @@
 # Language Buddy 🇩🇪
 
-A mobile-first language learning application that uses an AI chatbot to create personalized exercises based on your conversations. Currently focused on German language learning.
+A language learning application that uses AI to create personalised exercises based on the user's conversations. Currently focused on German language learning.
 
 ## Features
 
 ### 🤖 Interactive Chat
 
 - Natural conversation with an AI language tutor
-- Contextual responses based on your learning level
+- Contextual responses based on user's learning level
 - Automatic exercise generation from chat interactions
-- Real-time feedback and encouragement
 
 ### 👤 User Profile
 
-- Customizable learning level
+- Customisable learning level
 - Target and native language settings
 - Personal learning goals
 - Progress history
@@ -29,7 +28,7 @@ A mobile-first language learning application that uses an AI chatbot to create p
 
 - Node.js 18+
 - npm or yarn
-- OpenAI API key (optional, for enhanced AI responses)
+- OpenAI API key
 
 ### Installation
 
@@ -75,32 +74,14 @@ For the best experience, open the developer tools and switch to mobile view, or 
 3. **Exercise Generation**: The bot will automatically create exercises based on your conversations
 4. **Practice Exercises**: Switch to the Exercises tab to practice
 5. **Track Progress**: Monitor your learning in the Progress tab
-6. **Customize Profile**: Update your settings in the Profile tab
+6. **Customise Profile**: Update your settings in the Profile tab
 
 ## Technologies Used
 
 - **React 19** - UI framework
 - **TypeScript** - Type safety
 - **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first styling
 - **Lucide React** - Icons
-- **Mobile-first responsive design**
-
-## Project Structure
-
-```
-src/
-├── components/           # React components
-│   ├── ChatInterface.tsx    # Main chat interface
-│   ├── ProfileView.tsx      # User profile management
-├── types/               # TypeScript type definitions
-│   └── index.ts
-├── utils/               # Utility functions
-│   └── chatbot.ts          # AI chatbot logic
-├── App.tsx             # Main app component
-├── main.tsx            # App entry point
-└── index.css           # Global styles
-```
 
 ## Features in Development
 
@@ -109,7 +90,6 @@ src/
 - [ ] Multiple language support
 - [ ] Social features (friend progress)
 - [ ] Advanced grammar lessons
-- [ ] Spaced repetition system
 
 ## Contributing
 
@@ -122,10 +102,3 @@ src/
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- German language content and grammar rules
-- Mobile-first design principles
-- Accessibility best practices
-  import reactDom from 'eslint-plugin-react-dom'

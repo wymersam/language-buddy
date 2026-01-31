@@ -8,17 +8,13 @@ interface FillInBlankExerciseProps {
 }
 
 const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
-  question,
   userAnswer,
   onAnswerChange,
   disabled,
 }) => {
-  const parts = question.split("___");
-
   return (
     <div className="exercise-fill-blank">
       <p className="exercise-sentence">
-        {parts[0]}
         <input
           type="text"
           value={userAnswer}
@@ -27,7 +23,6 @@ const FillInBlankExercise: React.FC<FillInBlankExerciseProps> = ({
           className="fill-blank-input"
           placeholder="..."
         />
-        {parts[1]}
       </p>
     </div>
   );

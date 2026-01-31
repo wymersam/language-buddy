@@ -9,6 +9,7 @@ interface ExerciseNavigationProps {
   onPrevious: () => void;
   onNext: () => void;
   onNewExercises: () => void;
+  isGeneratingExercises?: boolean;
 }
 
 const ExerciseNavigation: React.FC<ExerciseNavigationProps> = ({
@@ -20,6 +21,7 @@ const ExerciseNavigation: React.FC<ExerciseNavigationProps> = ({
   onPrevious,
   onNext,
   onNewExercises,
+  isGeneratingExercises,
 }) => {
   if (!showResult) {
     return (
@@ -48,11 +50,23 @@ const ExerciseNavigation: React.FC<ExerciseNavigationProps> = ({
             Next Exercise
           </button>
         )}
-        {currentIndex === totalExercises - 1 && (
-          <button className="btn-primary" onClick={onNewExercises}>
-            New Exercises
-          </button>
-        )}
+        <button
+          className="btn-secondary ml-2"
+          onClick={() => {
+            console.log("🔥 New Exercises button clicked");
+            onNewExercises();
+          }}
+          disabled={isGeneratingExercises}
+        >
+          {isGeneratingExercises ? (
+            <>
+              <span className="loading-spinner">⏳</span>
+              Generating...
+            </>
+          ) : (
+            "New Exercises"
+          )}
+        </button>
       </div>
     </div>
   );

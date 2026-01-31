@@ -189,32 +189,6 @@ export default function ProfileView({ user, setUser }: ProfileViewProps) {
           </div>
         </div>
 
-        <div className="profile-section areas-section">
-          <h3 className="section-title">📚 Learning Areas</h3>
-
-          <div className="areas-group">
-            <label className="areas-label">📈 Areas to Improve</label>
-            <div className="tags-container">
-              {user.weakAreas.map((area, index) => (
-                <span key={index} className="tag weakness">
-                  {area}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="areas-group">
-            <label className="areas-label">✨ Strengths</label>
-            <div className="tags-container">
-              {user.strengths.map((strength, index) => (
-                <span key={index} className="tag strength">
-                  {strength}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
         <div className="profile-section danger-section">
           <h3 className="section-title">⚠️ Data Management</h3>
           <p className="danger-description">

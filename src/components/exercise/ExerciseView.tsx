@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { Exercise } from "../../types";
 import ExerciseHeader from "./ExerciseHeader";
 import ExerciseContent from "./ExerciseContent";
@@ -7,11 +7,15 @@ import ExerciseNavigation from "./ExerciseNavigation";
 interface ExerciseViewProps {
   exercises: Exercise[];
   onComplete?: (exerciseId: string, isCorrect: boolean) => void;
+  onNewExercises?: () => void;
+  isGeneratingExercises?: boolean;
 }
 
 const ExerciseView: React.FC<ExerciseViewProps> = ({
   exercises,
   onComplete,
+  onNewExercises,
+  isGeneratingExercises,
 }) => {
   const [currentExercise, setCurrentExercise] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -19,11 +23,25 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
+  // Reset to first exercise when exercises change
+  useEffect(() => {
+    setCurrentExercise(0);
+    setUserAnswer("");
+    setSelectedOption(null);
+    setShowResult(false);
+    setIsCorrect(false);
+  }, [exercises]);
+
   if (!exercises.length) {
     return null;
   }
 
   const exercise = exercises[currentExercise];
+
+  // Safety check in case currentExercise index is out of bounds
+  if (!exercise) {
+    return null;
+  }
 
   const checkAnswer = () => {
     const answer =
@@ -95,7 +113,8 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({
         totalExercises={exercises.length}
         onPrevious={previousExercise}
         onNext={nextExercise}
-        onNewExercises={() => window.location.reload()}
+        onNewExercises={onNewExercises || (() => {})}
+        isGeneratingExercises={isGeneratingExercises}
       />
     </div>
   );
