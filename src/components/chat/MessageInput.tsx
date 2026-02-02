@@ -1,16 +1,6 @@
-import React, { useState } from "react";
-import { Send, BookOpen, MessageCircle } from "lucide-react";
-import type { User } from "../../types";
-
-interface MessageInputProps {
-  inputMessage: string;
-  setInputMessage: (message: string) => void;
-  onSendMessage: () => void;
-  onKeyPress: (e: React.KeyboardEvent) => void;
-  isTyping: boolean;
-  user: User;
-  onToggleExercises: () => void;
-}
+import React from "react";
+import { Send } from "lucide-react";
+import type { MessageInputProps } from "../../types";
 
 const MessageInput: React.FC<MessageInputProps> = ({
   inputMessage,
@@ -18,28 +8,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
   onKeyPress,
   isTyping,
-  user,
-  onToggleExercises,
 }) => {
-  const [showToggleFeedback, setShowToggleFeedback] = useState(false);
-
-  const handleToggleExercises = () => {
-    onToggleExercises();
-    setShowToggleFeedback(true);
-    setTimeout(() => setShowToggleFeedback(false), 2000);
-  };
-
   return (
     <div className="input-container">
-      {/* Toggle feedback message */}
-      {showToggleFeedback && (
-        <div className="toggle-feedback">
-          {user.generateExercises
-            ? "Exercises enabled"
-            : "Switched to chat only"}
-        </div>
-      )}
-
       <div className="input-wrapper">
         <div className="input-field-wrapper">
           <textarea
@@ -53,22 +24,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
             disabled={isTyping}
           />
         </div>
-
-        <button
-          onClick={handleToggleExercises}
-          className={`input-exercise-toggle ${user.generateExercises ? "enabled" : "disabled"}`}
-          title={
-            user.generateExercises
-              ? "Currently generating exercises from conversations. Click to switch to chat-only mode."
-              : "Currently in chat-only mode. Click to enable automatic exercise generation based on your conversations."
-          }
-        >
-          {user.generateExercises ? (
-            <BookOpen size={18} />
-          ) : (
-            <MessageCircle size={18} />
-          )}
-        </button>
 
         <button
           onClick={onSendMessage}

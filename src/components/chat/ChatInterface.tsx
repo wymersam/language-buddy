@@ -18,8 +18,7 @@ export default function ChatInterface({
   user,
   currentSession,
   setCurrentSession,
-  onNewExercises,
-  onUserUpdate,
+  // onNewExercises,
 }: ChatInterfaceProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -31,15 +30,6 @@ export default function ChatInterface({
 
   useEffect(scrollToBottom, [currentSession?.messages]);
 
-  const toggleExerciseGeneration = () => {
-    if (onUserUpdate) {
-      onUserUpdate({
-        ...user,
-        generateExercises: !user.generateExercises,
-      });
-    }
-  };
-
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
@@ -50,7 +40,7 @@ export default function ChatInterface({
       timestamp: new Date(),
     };
 
-    // Initialize session if needed
+    // Initialise session if needed
     if (!currentSession) {
       const newSession: ChatSession = {
         id: uuidv4(),
@@ -71,11 +61,10 @@ export default function ChatInterface({
     // Simulate bot processing time
     setTimeout(
       async () => {
-        const { botResponse, exercises } = await generateBotResponse(
+        const { botResponse } = await generateBotResponse(
           userMessage.content,
           user,
           currentSession?.messages || [],
-          false, // Don't force exercises in chat - let natural conversation trigger them
         );
 
         const botMessage: Message = {
@@ -98,9 +87,9 @@ export default function ChatInterface({
         setIsTyping(false);
 
         // Handle exercises if generated
-        if (exercises && exercises.length > 0 && onNewExercises) {
-          onNewExercises(exercises);
-        }
+        // if (exercises && exercises.length > 0 && onNewExercises) {
+        //   onNewExercises(exercises);
+        // }
       },
       1000 + Math.random() * 2000,
     ); // Random delay 1-3 seconds
@@ -118,10 +107,7 @@ export default function ChatInterface({
     console.log("From message:", fullText);
 
     // TODO:add additional logic here, such as:
-    // - Showing a translation tooltip
     // - Adding to vocabulary list
-    // - Triggering exercises based on selected words
-    // - etc.
   };
 
   return (
@@ -147,8 +133,6 @@ export default function ChatInterface({
         onSendMessage={handleSendMessage}
         onKeyPress={handleKeyPress}
         isTyping={isTyping}
-        user={user}
-        onToggleExercises={toggleExerciseGeneration}
       />
     </div>
   );

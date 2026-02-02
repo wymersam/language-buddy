@@ -5,7 +5,7 @@ export interface User {
   targetLanguage: string;
   nativeLanguage: string;
   responseLanguage: "bilingual" | "german-only";
-  generateExercises: boolean;
+  // generateExercises: boolean;
   avatar?: string; // Base64 encoded image data
 }
 
@@ -14,6 +14,14 @@ export interface Message {
   content: string;
   isUser: boolean;
   timestamp: Date;
+}
+
+export interface MessageInputProps {
+  inputMessage: string;
+  setInputMessage: (message: string) => void;
+  onSendMessage: () => void;
+  onKeyPress: (e: React.KeyboardEvent) => void;
+  isTyping: boolean;
 }
 
 export interface Exercise {
@@ -25,6 +33,13 @@ export interface Exercise {
   explanation?: string;
   difficulty: string;
   topic: string;
+}
+
+export interface ExerciseViewProps {
+  exercises: Exercise[];
+  onComplete?: (exerciseId: string, isCorrect: boolean) => void;
+  onNewExercises?: () => void;
+  isGeneratingExercises?: boolean;
 }
 
 export interface ChatSession {

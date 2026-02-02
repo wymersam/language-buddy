@@ -22,7 +22,6 @@ const initialUser: User = {
   targetLanguage: "German",
   nativeLanguage: "English",
   responseLanguage: "bilingual",
-  generateExercises: true,
 };
 
 export default function App() {
@@ -55,42 +54,133 @@ export default function App() {
 
   const handleMoreExercises = async () => {
     setIsGeneratingExercises(true);
-    console.log("🔄 Generating new exercises...");
 
     try {
-      // Generate new exercises based on user's overall interaction
-      const { generateBotResponse } = await import("./utils/chatbot");
-      const genericPrompt = `Please create new practice exercises for me to help me learn German. Mix different types of exercises.`;
+      // Generate new exercises based on user's conversation history
+      const exercisePrompt = `Based on our conversation history, create 3-5 diverse German language practice exercises for a ${user.level} level student. 
+      
+Create exercises in this JSON format:
+      [
+        {
+          "id": "unique-id",
+          "type": "fill-in-blank" | "multiple-choice" | "translation" | "word-order",
+          "question": "Question text in ${user.responseLanguage === "german-only" ? "German" : "English"}",
+          "options": ["option1", "option2", "option3", "option4"] // for multiple-choice only
+          "correctAnswer": "correct answer",
+          "explanation": "Explanation of the answer",
+          "difficulty": "${user.level}",
+          "topic": "topic name"
+        }
+      ]
+      
+Mix different exercise types. Focus on vocabulary and grammar concepts from our conversation. Return only valid JSON, no additional text.`;
 
-      const result = await generateBotResponse(
-        genericPrompt,
-        user,
-        currentSession?.messages || [], // Include conversation history
-        true, // Force exercise generation
-      );
+      const response = await fetch("/.netlify/functions/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "system",
+              content: `You are a German language exercise generator. Create diverse practice exercises in valid JSON format only. No explanations, just JSON.`,
+            },
+            ...(currentSession?.messages.slice(-5).map((msg) => ({
+              role: msg.isUser ? "user" : "assistant",
+              content: msg.content,
+            })) || []),
+            {
+              role: "user",
+              content: exercisePrompt,
+            },
+          ],
+        }),
+      });
 
-      console.log("✅ Generated exercises:", result.exercises);
+      if (response.ok) {
+        const completion = await response.json();
+        const exerciseContent = completion.choices[0]?.message?.content || "";
 
-      if (result.exercises && result.exercises.length > 0) {
-        setExercises(result.exercises);
-        console.log("📝 Updated exercises state");
-        // Force re-render by updating key or triggering reset
-        setActiveTab("exercises"); // This will re-mount the component
-        console.log("🏠 Set active tab to exercises");
+        try {
+          // Extract JSON from response (in case there's extra text)
+          const jsonMatch = exerciseContent.match(/\[.*\]/s);
+          const jsonText = jsonMatch ? jsonMatch[0] : exerciseContent;
+          const newExercises = JSON.parse(jsonText);
+
+          if (Array.isArray(newExercises) && newExercises.length > 0) {
+            // Add unique IDs if missing
+            const exercisesWithIds = newExercises.map((ex, index) => ({
+              ...ex,
+              id: ex.id || `exercise-${Date.now()}-${index}`,
+            }));
+
+            setExercises(exercisesWithIds);
+            console.log("✅ Generated exercises:", exercisesWithIds);
+          } else {
+            throw new Error("No valid exercises returned");
+          }
+        } catch (parseError) {
+          console.error("Failed to parse exercises JSON:", parseError);
+          console.log("Raw response:", exerciseContent);
+
+          // Fallback: create sample exercises
+          const fallbackExercises = createFallbackExercises(user);
+          setExercises(fallbackExercises);
+        }
       } else {
-        console.log("❌ No exercises generated");
+        throw new Error(`API request failed: ${response.status}`);
       }
     } catch (error) {
       console.error("Failed to generate new exercises:", error);
+
+      // Fallback: create sample exercises
+      const fallbackExercises = createFallbackExercises(user);
+      setExercises(fallbackExercises);
     } finally {
       setIsGeneratingExercises(false);
     }
   };
 
+  const createFallbackExercises = (user: User): Exercise[] => {
+    const baseExercises = [
+      {
+        id: `fallback-1-${Date.now()}`,
+        type: "multiple-choice" as const,
+        question: "What is the German word for 'hello'?",
+        options: ["Hallo", "Tschüss", "Danke", "Bitte"],
+        correctAnswer: "Hallo",
+        explanation: "'Hallo' is the most common way to say hello in German.",
+        difficulty: user.level,
+        topic: "Greetings",
+      },
+      {
+        id: `fallback-2-${Date.now()}`,
+        type: "fill-in-blank" as const,
+        question: "Ich _____ Deutsch. (I speak German)",
+        correctAnswer: "spreche",
+        explanation:
+          "'spreche' is the first person singular form of 'sprechen' (to speak).",
+        difficulty: user.level,
+        topic: "Verbs",
+      },
+      {
+        id: `fallback-3-${Date.now()}`,
+        type: "translation" as const,
+        question: "Translate: Thank you very much",
+        correctAnswer: "Vielen Dank",
+        explanation:
+          "'Vielen Dank' is a polite way to say 'thank you very much' in German.",
+        difficulty: user.level,
+        topic: "Politeness",
+      },
+    ];
+
+    return baseExercises;
+  };
+
   const handleNewExercises = (newExercises: Exercise[]) => {
     setExercises(newExercises);
-    // Auto-switch to exercises tab when new exercises are generated
-    setActiveTab("exercises");
   };
 
   const handleUserUpdate = (updatedUser: User) => {

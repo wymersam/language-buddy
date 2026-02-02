@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { BookOpen, MessageCircle, Zap } from "lucide-react";
-import type { Exercise } from "../../types";
+import type { ExerciseViewProps } from "../../types";
 import ExerciseHeader from "./ExerciseHeader";
 import ExerciseContent from "./ExerciseContent";
 import ExerciseResult from "./ExerciseResult";
 import ExerciseNavigation from "./ExerciseNavigation";
-interface ExerciseViewProps {
-  exercises: Exercise[];
-  onComplete?: (exerciseId: string, isCorrect: boolean) => void;
-  onNewExercises?: () => void;
-  isGeneratingExercises?: boolean;
-}
 
 const ExerciseView: React.FC<ExerciseViewProps> = ({
   exercises,
@@ -58,17 +52,6 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({
                   <strong>Chat with your tutor</strong>
                   <p>
                     Start a conversation in the Chat tab to learn new topics
-                  </p>
-                </div>
-              </div>
-
-              <div className="tip-item">
-                <BookOpen size={20} className="tip-icon" />
-                <div className="tip-content">
-                  <strong>Enable exercise generation</strong>
-                  <p>
-                    Toggle the book icon next to the send button to create
-                    exercises from your conversations
                   </p>
                 </div>
               </div>
