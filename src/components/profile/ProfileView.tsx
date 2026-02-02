@@ -230,7 +230,12 @@ export default function ProfileView({ user, setUser }: ProfileViewProps) {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Response Language</label>
+            <label className="form-label">
+              Response Language{" "}
+              <span className="response-language-info">
+                (the language in which the app responds)
+              </span>
+            </label>
             {isEditing ? (
               <select
                 value={editedUser.responseLanguage}

@@ -11,7 +11,13 @@ const WelcomeMessage: React.FC = () => {
         <h2 className="welcome-title">Hallo! I'm your German tutor</h2>
         <p className="welcome-description">
           Start chatting with me in English or German! I'll help you learn by
-          creating personalized exercises based on our conversations.
+          creating personalised exercises based on our conversations.
+        </p>
+        <p className="welcome-description">
+          💡 <strong>Exercise Tips:</strong> Use the 🎯/💬 button next to the
+          send button to toggle exercise generation on/off. When enabled, I'll
+          automatically create practice exercises from our conversations that
+          appear in the Practice tab!
         </p>
       </div>
     </div>

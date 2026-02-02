@@ -112,7 +112,7 @@ export default function App() {
       </header>
 
       <main
-        className={`main-content ${activeTab === "profile" ? "main-content-compact" : ""}`}
+        className={`main-content ${activeTab === "profile" ? "main-content-compact" : activeTab === "exercises" ? "main-content-compact" : ""}`}
       >
         {activeTab === "chat" && (
           <ChatInterface

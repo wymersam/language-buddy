@@ -22,20 +22,11 @@ const MessageInput: React.FC<MessageInputProps> = ({
   onToggleExercises,
 }) => {
   const [showToggleFeedback, setShowToggleFeedback] = useState(false);
-  const [showStatusTooltip, setShowStatusTooltip] = useState(false);
 
   const handleToggleExercises = () => {
     onToggleExercises();
     setShowToggleFeedback(true);
     setTimeout(() => setShowToggleFeedback(false), 2000);
-  };
-
-  const handleStatusTouch = () => {
-    setShowStatusTooltip(!showStatusTooltip);
-    // Auto-hide after 3 seconds on mobile
-    if (!showStatusTooltip) {
-      setTimeout(() => setShowStatusTooltip(false), 2500);
-    }
   };
 
   return (
@@ -48,31 +39,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
             : "Switched to chat only"}
         </div>
       )}
-
-      {/* Status indicator */}
-      <div className="input-status">
-        <span
-          className={`status-indicator ${user.generateExercises ? "exercises" : "chat"}`}
-          title={
-            user.generateExercises
-              ? "Practice exercises will be created in the 'Practice' tab"
-              : "Regular conversation without exercise generation"
-          }
-          onClick={handleStatusTouch}
-          onTouchStart={handleStatusTouch}
-        >
-          {user.generateExercises ? "🎯 Exercises ON" : "💬 Chat Only"}
-        </span>
-
-        {/* Mobile tooltip */}
-        {showStatusTooltip && (
-          <div className="mobile-tooltip">
-            {user.generateExercises
-              ? "Practice exercises will be created in the 'Practice' tab"
-              : "Regular conversation without exercise generation"}
-          </div>
-        )}
-      </div>
 
       <div className="input-wrapper">
         <div className="input-field-wrapper">

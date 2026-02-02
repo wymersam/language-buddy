@@ -226,6 +226,7 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border-radius: 1.5rem;
   padding: 1.5rem;
+  margin-bottom: 4rem;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
@@ -774,6 +775,11 @@ body {
   text-transform: capitalize;
 }
 
+.response-language-info {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
 /* Learning Areas */
 .areas-section {
   background: rgba(255, 255, 255, 0.8);
@@ -876,14 +882,6 @@ body {
     -webkit-tap-highlight-color: transparent;
   }
 
-  input:focus,
-  textarea:focus,
-  select:focus,
-  button:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-  }
-
   input[type="text"],
   input[type="email"],
   input[type="password"],
@@ -925,8 +923,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
+  outline: none;
 }
 
 /* Exercise View Styles */
@@ -1280,40 +1277,6 @@ textarea:focus-visible {
   box-shadow: 0 2px 4px -1px rgba(239, 68, 68, 0.3);
 }
 
-/* Exercise Toggle in Input */
-.input-status {
-  display: flex;
-  justify-content: center;
-  padding-bottom: 0.5rem;
-  position: relative;
-  z-index: 10;
-}
-
-.status-indicator {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  transition: all 0.3s ease;
-}
-
-.status-indicator.exercises {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border: 1px solid #8b5cf6;
-  color: white;
-  cursor: pointer;
-  position: relative;
-  opacity: 0.8;
-}
-
-.status-indicator.chat {
-  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-  color: #374151;
-  border: 1px solid #d1d5db;
-  cursor: pointer;
-  position: relative;
-}
-
 .mobile-tooltip {
   position: fixed;
   top: 50%;
@@ -1379,7 +1342,6 @@ textarea:focus-visible {
   backdrop-filter: blur(16px);
   border: 2px solid transparent;
   border-radius: 1rem;
-  padding: 0.75rem;
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
@@ -1389,6 +1351,12 @@ textarea:focus-visible {
   margin-left: 0.3rem;
   margin-right: 0.3rem;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .input-exercise-toggle {
+    padding: 0.532rem 0.657rem;
+  }
 }
 
 .input-exercise-toggle.enabled {
