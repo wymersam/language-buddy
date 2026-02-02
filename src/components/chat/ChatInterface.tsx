@@ -1,7 +1,14 @@
 import React, { useState, useRef } from "react";
-import type { User, Message, ChatSession, Exercise } from "../../types";
+import type {
+  User,
+  Message,
+  ChatSession,
+  Exercise,
+  VocabularyWord,
+} from "../../types";
 import { v4 as uuidv4 } from "uuid";
 import { generateBotResponse } from "../../utils/chatbot";
+import { translateText } from "../../utils/translation";
 import WelcomeMessage from "./WelcomeMessage";
 import MessagesList from "./MessagesList";
 import MessageInput from "./MessageInput";
@@ -12,13 +19,14 @@ interface ChatInterfaceProps {
   setCurrentSession: (session: ChatSession | null) => void;
   onNewExercises?: (exercises: Exercise[]) => void;
   onUserUpdate?: (user: User) => void;
+  onAddVocabularyWord?: (word: VocabularyWord) => void;
 }
 
 export default function ChatInterface({
   user,
   currentSession,
   setCurrentSession,
-  // onNewExercises,
+  onAddVocabularyWord,
 }: ChatInterfaceProps) {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -133,11 +141,6 @@ export default function ChatInterface({
         setTimeout(() => {
           scrollToBottom();
         }, 100);
-
-        // Handle exercises if generated
-        // if (exercises && exercises.length > 0 && onNewExercises) {
-        //   onNewExercises(exercises);
-        // }
       },
       1000 + Math.random() * 2000,
     ); // Random delay 1-3 seconds
@@ -150,12 +153,44 @@ export default function ChatInterface({
     }
   };
 
-  const handleTextSelection = (selectedText: string, fullText: string) => {
-    console.log("Text selected by user:", selectedText);
-    console.log("From message:", fullText);
+  const handleTextSelection = async (
+    selectedText: string,
+    fullText: string,
+  ) => {
+    // Add selected word to vocabulary
+    if (onAddVocabularyWord && selectedText.trim()) {
+      try {
+        // Get translation for the selected word
+        const translationResult = await translateText(selectedText.trim());
 
-    // TODO:add additional logic here, such as:
-    // - Adding to vocabulary list
+        const newVocabularyWord: VocabularyWord = {
+          id: uuidv4(),
+          word: selectedText.trim(),
+          translation: translationResult.translation,
+          dateAdded: new Date(),
+          context: fullText,
+          sourceLanguage: "german",
+          targetLanguage: "english",
+        };
+
+        onAddVocabularyWord(newVocabularyWord);
+      } catch (error) {
+        console.error("Failed to translate word:", error);
+
+        // Fallback: add word without translation
+        const newVocabularyWord: VocabularyWord = {
+          id: uuidv4(),
+          word: selectedText.trim(),
+          translation: `[${selectedText.trim()}]`, // Fallback translation
+          dateAdded: new Date(),
+          context: fullText,
+          sourceLanguage: "german",
+          targetLanguage: "english",
+        };
+
+        onAddVocabularyWord(newVocabularyWord);
+      }
+    }
   };
 
   return (

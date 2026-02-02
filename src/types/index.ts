@@ -35,6 +35,26 @@ export interface Exercise {
   topic: string;
 }
 
+export interface ExampleSentence {
+  german: string;
+  english: string;
+  difficulty: "beginner" | "intermediate" | "advanced";
+}
+
+export interface VocabularyWord {
+  id: string;
+  word: string;
+  translation: string;
+  context: string; // The full message where it was found
+  examples?: ExampleSentence[]; // Generated example sentences
+  dateAdded: Date;
+  sourceLanguage: string;
+  targetLanguage: string;
+  difficulty?: string;
+  timesReviewed?: number;
+  lastReviewed?: Date;
+}
+
 export interface ExerciseViewProps {
   exercises: Exercise[];
   onComplete?: (exerciseId: string, isCorrect: boolean) => void;

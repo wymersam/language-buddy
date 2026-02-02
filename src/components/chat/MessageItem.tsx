@@ -38,9 +38,6 @@ const MessageItem: React.FC<MessageItemPropsExtended> = ({
     const selectedText = selection?.toString().trim();
 
     if (selectedText && selectedText.length > 0 && messageRef.current) {
-      console.log("Selected text:", selectedText);
-      console.log("Full message:", message.content);
-
       // Get the bounding rect of the message for positioning
       const messageRect = messageRef.current.getBoundingClientRect();
       const x = messageRect.left + messageRect.width / 2;

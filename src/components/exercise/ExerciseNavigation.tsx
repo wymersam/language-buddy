@@ -53,7 +53,6 @@ const ExerciseNavigation: React.FC<ExerciseNavigationProps> = ({
         <button
           className="btn-secondary ml-2"
           onClick={() => {
-            console.log("🔥 New Exercises button clicked");
             onNewExercises();
           }}
           disabled={isGeneratingExercises}

@@ -1,10 +1,17 @@
-import type { User, ChatSession, Exercise, StoredMessage } from "../types";
+import type {
+  User,
+  ChatSession,
+  Exercise,
+  StoredMessage,
+  VocabularyWord,
+} from "../types";
 
 // Storage keys
 const STORAGE_KEYS = {
   USER: "language-buddy-user",
   CURRENT_SESSION: "language-buddy-current-session",
   EXERCISES: "language-buddy-exercises",
+  VOCABULARY: "language-buddy-vocabulary",
 } as const;
 
 // Check if localStorage is available
@@ -117,6 +124,58 @@ export const loadExercises = (): Exercise[] => {
   } catch (error) {
     console.warn("Failed to load exercises:", error);
     return [];
+  }
+};
+
+// Vocabulary persistence
+export const saveVocabulary = (vocabulary: VocabularyWord[]): void => {
+  if (!isLocalStorageAvailable()) return;
+  try {
+    const vocabularyToSave = vocabulary.map((word) => ({
+      ...word,
+      dateAdded: word.dateAdded.toISOString(),
+      lastReviewed: word.lastReviewed?.toISOString(),
+    }));
+    localStorage.setItem(
+      STORAGE_KEYS.VOCABULARY,
+      JSON.stringify(vocabularyToSave),
+    );
+  } catch (error) {
+    console.warn("Failed to save vocabulary:", error);
+  }
+};
+
+export const loadVocabulary = (): VocabularyWord[] => {
+  if (!isLocalStorageAvailable()) return [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEYS.VOCABULARY);
+    if (!stored) return [];
+
+    const parsed = JSON.parse(stored);
+    return parsed.map((word: any) => ({
+      ...word,
+      dateAdded: new Date(word.dateAdded),
+      lastReviewed: word.lastReviewed ? new Date(word.lastReviewed) : undefined,
+    }));
+  } catch (error) {
+    console.warn("Failed to load vocabulary:", error);
+    return [];
+  }
+};
+
+export const addVocabularyWord = (word: VocabularyWord): void => {
+  const currentVocabulary = loadVocabulary();
+
+  // Check if word already exists (avoid duplicates)
+  const existingWord = currentVocabulary.find(
+    (w) =>
+      w.word.toLowerCase() === word.word.toLowerCase() &&
+      w.sourceLanguage === word.sourceLanguage,
+  );
+
+  if (!existingWord) {
+    const updatedVocabulary = [...currentVocabulary, word];
+    saveVocabulary(updatedVocabulary);
   }
 };
 

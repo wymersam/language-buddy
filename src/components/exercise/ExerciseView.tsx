@@ -70,7 +70,6 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({
             <div className="generate-exercises-btn-container">
               <button
                 onClick={() => {
-                  console.log("🔥 Generate exercises from empty state");
                   onNewExercises?.();
                 }}
                 disabled={isGeneratingExercises}

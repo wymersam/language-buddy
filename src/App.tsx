@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, User as UserIcon, BookOpen } from "lucide-react";
+import { MessageCircle, User as UserIcon, BookOpen, Book } from "lucide-react";
 import ChatInterface from "./components/chat/ChatInterface";
 import ProfileView from "./components/profile/ProfileView";
 import ExerciseView from "./components/exercise/ExerciseView";
-import type { User, ChatSession, Exercise } from "./types";
+import VocabularyView from "./components/vocabulary/VocabularyView";
+import type { User, ChatSession, Exercise, VocabularyWord } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import {
   saveUser,
@@ -12,6 +13,8 @@ import {
   loadCurrentSession,
   saveExercises,
   loadExercises,
+  loadVocabulary,
+  saveVocabulary,
 } from "./utils/storage";
 import { TabButton } from "./components/TabButton";
 
@@ -25,14 +28,17 @@ const initialUser: User = {
 };
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"chat" | "profile" | "exercises">(
-    "chat",
-  );
+  const [activeTab, setActiveTab] = useState<
+    "chat" | "profile" | "exercises" | "vocabulary"
+  >("chat");
   const [user, setUser] = useState<User>(() => loadUser() || initialUser);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(() =>
     loadCurrentSession(),
   );
   const [exercises, setExercises] = useState<Exercise[]>(() => loadExercises());
+  const [vocabulary, setVocabulary] = useState<VocabularyWord[]>(() =>
+    loadVocabulary(),
+  );
   const [isGeneratingExercises, setIsGeneratingExercises] = useState(false);
 
   // Save user data when it changes
@@ -52,11 +58,15 @@ export default function App() {
     saveExercises(exercises);
   }, [exercises]);
 
+  // Save vocabulary when it changes
+  useEffect(() => {
+    saveVocabulary(vocabulary);
+  }, [vocabulary]);
+
   const handleMoreExercises = async () => {
     setIsGeneratingExercises(true);
 
     try {
-      // Generate new exercises based on user's conversation history
       const exercisePrompt = `Based on our conversation history, create 3-5 new, diverse German language practice exercises for a ${user.level} level student. 
       
 Create exercises in this JSON format:
@@ -120,60 +130,15 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
           }
         } catch (parseError) {
           console.error("Failed to parse exercises JSON:", parseError);
-
-          // Fallback: create sample exercises
-          const fallbackExercises = createFallbackExercises(user);
-          setExercises(fallbackExercises);
         }
       } else {
         throw new Error(`API request failed: ${response.status}`);
       }
     } catch (error) {
       console.error("Failed to generate new exercises:", error);
-
-      // Fallback: create sample exercises
-      const fallbackExercises = createFallbackExercises(user);
-      setExercises(fallbackExercises);
     } finally {
       setIsGeneratingExercises(false);
     }
-  };
-
-  const createFallbackExercises = (user: User): Exercise[] => {
-    const baseExercises = [
-      {
-        id: `fallback-1-${Date.now()}`,
-        type: "multiple-choice" as const,
-        question: "What is the German word for 'hello'?",
-        options: ["Hallo", "Tschüss", "Danke", "Bitte"],
-        correctAnswer: "Hallo",
-        explanation: "'Hallo' is the most common way to say hello in German.",
-        difficulty: user.level,
-        topic: "Greetings",
-      },
-      {
-        id: `fallback-2-${Date.now()}`,
-        type: "fill-in-blank" as const,
-        question: "Ich _____ Deutsch. (I speak German)",
-        correctAnswer: "spreche",
-        explanation:
-          "'spreche' is the first person singular form of 'sprechen' (to speak).",
-        difficulty: user.level,
-        topic: "Verbs",
-      },
-      {
-        id: `fallback-3-${Date.now()}`,
-        type: "translation" as const,
-        question: "Translate: Thank you very much",
-        correctAnswer: "Vielen Dank",
-        explanation:
-          "'Vielen Dank' is a polite way to say 'thank you very much' in German.",
-        difficulty: user.level,
-        topic: "Politeness",
-      },
-    ];
-
-    return baseExercises;
   };
 
   const handleNewExercises = (newExercises: Exercise[]) => {
@@ -183,6 +148,41 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
   const handleUserUpdate = (updatedUser: User) => {
     setUser(updatedUser);
     saveUser(updatedUser);
+  };
+
+  const handleRemoveVocabularyWord = (wordId: string) => {
+    setVocabulary((prev) => prev.filter((word) => word.id !== wordId));
+  };
+
+  const handleUpdateVocabularyWord = (updatedWord: VocabularyWord) => {
+    setVocabulary((prev) =>
+      prev.map((word) => (word.id === updatedWord.id ? updatedWord : word)),
+    );
+  };
+
+  const handleClearAllVocabulary = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to clear all vocabulary words? This action cannot be undone.",
+      )
+    ) {
+      setVocabulary([]);
+    }
+  };
+
+  const handleAddVocabularyWord = (word: VocabularyWord) => {
+    setVocabulary((prev) => {
+      // Check if word already exists to avoid duplicates
+      const exists = prev.some(
+        (existingWord) =>
+          existingWord.word.toLowerCase() === word.word.toLowerCase(),
+      );
+
+      if (!exists) {
+        return [...prev, word];
+      }
+      return prev;
+    });
   };
 
   return (
@@ -208,6 +208,7 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
             setCurrentSession={setCurrentSession}
             onNewExercises={handleNewExercises}
             onUserUpdate={handleUserUpdate}
+            onAddVocabularyWord={handleAddVocabularyWord}
           />
         )}
 
@@ -220,6 +221,15 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
             exercises={exercises}
             onNewExercises={handleMoreExercises}
             isGeneratingExercises={isGeneratingExercises}
+          />
+        )}
+
+        {activeTab === "vocabulary" && (
+          <VocabularyView
+            vocabulary={vocabulary}
+            onRemoveWord={handleRemoveVocabularyWord}
+            onClearAll={handleClearAllVocabulary}
+            onUpdateWord={handleUpdateVocabularyWord}
           />
         )}
       </main>
@@ -238,6 +248,13 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
             icon={BookOpen}
             label="Practice"
             active={activeTab === "exercises"}
+            onClick={setActiveTab}
+          />
+          <TabButton
+            id="vocabulary"
+            icon={Book}
+            label="Vocabulary"
+            active={activeTab === "vocabulary"}
             onClick={setActiveTab}
           />
           <TabButton
