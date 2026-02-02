@@ -1,12 +1,6 @@
 import type { User, Message, Exercise } from "../types";
 import OpenAI from "openai";
 
-// Initialise OpenAI client
-const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY || "",
-  dangerouslyAllowBrowser: true, // Note: In production, use a backend API
-});
-
 export async function generateBotResponse(
   userMessage: string,
   user: User,
@@ -14,13 +8,6 @@ export async function generateBotResponse(
   forceExercises: boolean = false,
 ): Promise<{ botResponse: string; exercises?: Exercise[] }> {
   try {
-    // Check if OpenAI API key is available
-    if (!import.meta.env.VITE_OPENAI_API_KEY) {
-      return {
-        botResponse: "Sorry, the OpenAI API key is not configured.",
-      };
-    }
-
     // Build conversation context for OpenAI
     const systemPrompt = `You are a friendly German language tutor. Your student is at ${user.level} level learning ${user.targetLanguage} and wants to talk to you to practice and improve their German. 
 
@@ -105,12 +92,19 @@ General Guidelines:
       { role: "user", content: userMessage },
     ];
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages,
-      max_tokens: 800, // Increased for exercise generation
-      temperature: 0.8,
+    const res = await fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messages }),
     });
+
+    if (!res.ok) {
+      throw new Error(`Function error: ${res.status}`);
+    }
+
+    const completion = await res.json();
 
     const fullResponse = completion.choices[0]?.message?.content || "";
 
@@ -138,24 +132,10 @@ General Guidelines:
           exercisesPart = jsonMatch[0];
         }
 
-        interface ParsedExercise {
-          type:
-            | "fill-in-blank"
-            | "multiple-choice"
-            | "translation"
-            | "word-order";
-          question: string;
-          options?: string[];
-          correctAnswer: string;
-          explanation?: string;
-          difficulty: string;
-          topic: string;
-        }
-
-        const parsedExercises: ParsedExercise[] = JSON.parse(exercisesPart);
+        const parsedExercises: Exercise[] = JSON.parse(exercisesPart);
         exercises = parsedExercises.map((ex, index) => ({
-          id: `exercise_${Date.now()}_${index}`,
           ...ex,
+          id: `exercise_${Date.now()}_${index}`,
         }));
 
         console.log(`Generated ${exercises.length} exercises`);
