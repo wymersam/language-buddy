@@ -57,7 +57,7 @@ export default function App() {
 
     try {
       // Generate new exercises based on user's conversation history
-      const exercisePrompt = `Based on our conversation history, create 3-5 diverse German language practice exercises for a ${user.level} level student. 
+      const exercisePrompt = `Based on our conversation history, create 3-5 new, diverse German language practice exercises for a ${user.level} level student. 
       
 Create exercises in this JSON format:
       [
@@ -109,20 +109,17 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
           const newExercises = JSON.parse(jsonText);
 
           if (Array.isArray(newExercises) && newExercises.length > 0) {
-            // Add unique IDs if missing
             const exercisesWithIds = newExercises.map((ex, index) => ({
               ...ex,
               id: ex.id || `exercise-${Date.now()}-${index}`,
             }));
 
             setExercises(exercisesWithIds);
-            console.log("✅ Generated exercises:", exercisesWithIds);
           } else {
             throw new Error("No valid exercises returned");
           }
         } catch (parseError) {
           console.error("Failed to parse exercises JSON:", parseError);
-          console.log("Raw response:", exerciseContent);
 
           // Fallback: create sample exercises
           const fallbackExercises = createFallbackExercises(user);
