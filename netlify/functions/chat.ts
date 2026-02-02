@@ -50,8 +50,8 @@ export const handler: Handler = async (event) => {
     const completion = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
-      temperature: 0.8,
-      max_tokens: 800,
+      temperature: 0.7,
+      max_tokens: 600, // Reduced for faster generation
     });
 
     return {

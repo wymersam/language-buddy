@@ -20,8 +20,10 @@ Current student profile:
 Language Guidelines:
 ${
   user.responseLanguage === "german-only"
-    ? "- IMPORTANT: Respond ONLY in German. Do not use English translations or explanations."
-    : "- Use both German and English. For beginners (A1/A2), provide English translations and explanations."
+    ? "- CRITICAL: Respond ONLY in German. Do NOT use English translations or explanations."
+    : user.responseLanguage === "bilingual"
+      ? "Provide English translations alongside the German."
+      : ""
 }
 
 IMPORTANT: Your response should have two parts separated by "|||EXERCISES|||":
@@ -46,30 +48,25 @@ CRITICAL:
       forceExercises
         ? `USER CLICKED NEW EXERCISES BUTTON - MUST GENERATE NOW!
         
-Create 10 exercises based on:
-1. Recent conversation topics and what user has been learning
-2. User's level (${user.level}) 
-3. Mix different types: fill-in-blank, multiple-choice, translation
-4. Vary topics: grammar, vocabulary, sentence structure
+Create 5 quick exercises (not 10) based on:
+1. User's level (${user.level}) 
+2. Mix: fill-in-blank, multiple-choice
+3. Focus on common German topics: articles, verbs, adjectives
         
 Respond with exercises like this:
 "Here are new exercises!
 
 |||EXERCISES|||
-[{"type": "fill-in-blank", "question": "Der Mann geht ___ Schule.", "correctAnswer": "zur", "explanation": "Dative feminine", "difficulty": "${user.level}", "topic": "articles"},{"type": "multiple-choice", "question": "Ein klein___ Hund", "options": ["e", "en", "es", "er"], "correctAnswer": "er", "explanation": "Masculine nominative", "difficulty": "${user.level}", "topic": "adjectives"},{"type": "fill-in-blank", "question": "Ich sehe ___ Katze.", "correctAnswer": "die", "explanation": "Accusative feminine", "difficulty": "${user.level}", "topic": "articles"}]"`
+[{"type": "fill-in-blank", "question": "Der Mann geht ___ Schule.", "correctAnswer": "zur", "explanation": "Dative feminine", "difficulty": "${user.level}", "topic": "articles"},{"type": "multiple-choice", "question": "Ein klein___ Hund", "options": ["e", "en", "es", "er"], "correctAnswer": "er", "explanation": "Masculine nominative", "difficulty": "${user.level}", "topic": "adjectives"}]"`
         : user.generateExercises
-          ? `IMMEDIATELY create 10 exercises when user shows ANY interest in practicing - including saying "ja", "bitte", "bereit", "üben", "anfangen", or responding positively to exercise suggestions.
+          ? `Create 3-5 exercises when user shows interest in practicing.
 
 CREATE exercises based on:
-1. What the user is currently asking about or discussing
-2. Topics mentioned in their message
-3. Grammar points relevant to their question
-4. Vocabulary they're trying to learn
-5. Common mistakes they make
+1. Current conversation topic
+2. User's level (${user.level})
+3. Keep it simple and focused
 
-DO NOT just talk about exercises - CREATE the actual |||EXERCISES||| section!
-
-Format: First give a brief response, then |||EXERCISES||| then valid JSON array of exercise objects.`
+Format: First give a brief response, then |||EXERCISES||| then valid JSON array.`
           : "Do NOT create any exercises - omit the |||EXERCISES||| section entirely"
     }
 - The second part must be PURE JSON with no additional text
@@ -83,7 +80,7 @@ General Guidelines:
 
     const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
       { role: "system", content: systemPrompt },
-      ...conversationHistory.slice(-6).map(
+      ...conversationHistory.slice(-3).map(
         (msg): OpenAI.Chat.Completions.ChatCompletionMessageParam => ({
           role: msg.isUser ? "user" : "assistant",
           content: msg.content,
