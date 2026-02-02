@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { BookOpen, MessageCircle, Zap } from "lucide-react";
 import type { Exercise } from "../../types";
 import ExerciseHeader from "./ExerciseHeader";
 import ExerciseContent from "./ExerciseContent";
@@ -22,18 +23,93 @@ const ExerciseView: React.FC<ExerciseViewProps> = ({
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [lastExercisesLength, setLastExercisesLength] = useState(
+    exercises.length,
+  );
 
-  // Reset to first exercise when exercises change
-  useEffect(() => {
+  // Reset state when exercises array changes
+  if (exercises.length !== lastExercisesLength) {
     setCurrentExercise(0);
     setUserAnswer("");
     setSelectedOption(null);
     setShowResult(false);
     setIsCorrect(false);
-  }, [exercises]);
+    setLastExercisesLength(exercises.length);
+  }
 
   if (!exercises.length) {
-    return null;
+    return (
+      <div className="exercise-container">
+        <div className="welcome-container">
+          <div className="welcome-card">
+            <div className="welcome-icon">
+              <BookOpen size={32} className="text-white" />
+            </div>
+            <h2 className="welcome-title">Ready to Practice?</h2>
+            <p className="welcome-description">
+              No exercises yet! Here's how to get started with personalized
+              practice:
+            </p>
+
+            <div className="exercise-tips">
+              <div className="tip-item">
+                <MessageCircle size={20} className="tip-icon" />
+                <div className="tip-content">
+                  <strong>Chat with your tutor</strong>
+                  <p>
+                    Start a conversation in the Chat tab to learn new topics
+                  </p>
+                </div>
+              </div>
+
+              <div className="tip-item">
+                <BookOpen size={20} className="tip-icon" />
+                <div className="tip-content">
+                  <strong>Enable exercise generation</strong>
+                  <p>
+                    Toggle the book icon next to the send button to create
+                    exercises from your conversations
+                  </p>
+                </div>
+              </div>
+
+              <div className="tip-item">
+                <Zap size={20} className="tip-icon" />
+                <div className="tip-content">
+                  <strong>Generate exercises now</strong>
+                  <p>
+                    Click the button below to create practice exercises based on
+                    your level
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="generate-exercises-btn-container">
+              <button
+                onClick={() => {
+                  console.log("🔥 Generate exercises from empty state");
+                  onNewExercises?.();
+                }}
+                disabled={isGeneratingExercises}
+                className="generate-exercises-button"
+              >
+                {isGeneratingExercises ? (
+                  <>
+                    <span className="loading-spinner">⏳</span>
+                    Generating Exercises...
+                  </>
+                ) : (
+                  <>
+                    <BookOpen size={18} />
+                    Generate Practice Exercises
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const exercise = exercises[currentExercise];
