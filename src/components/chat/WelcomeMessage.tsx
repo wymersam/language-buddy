@@ -14,7 +14,7 @@ const WelcomeMessage: React.FC = () => {
           creating personalised exercises based on our conversations.
         </p>
         <p className="welcome-description">
-          💡 <strong>Exercise Tips:</strong> Use the 🎯/💬 button next to the
+          💡 <strong>Exercise Tips:</strong> Use the book/chat icon button next to the
           send button to toggle exercise generation on/off. When enabled, I'll
           automatically create practice exercises from our conversations that
           appear in the Practice tab!

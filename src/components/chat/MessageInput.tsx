@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Send } from "lucide-react";
+import { Send, BookOpen, MessageCircle } from "lucide-react";
 import type { User } from "../../types";
 
 interface MessageInputProps {
@@ -63,7 +63,11 @@ const MessageInput: React.FC<MessageInputProps> = ({
               : "Currently in chat-only mode. Click to enable automatic exercise generation based on your conversations."
           }
         >
-          {user.generateExercises ? "🎯" : "💬"}
+          {user.generateExercises ? (
+            <BookOpen size={18} />
+          ) : (
+            <MessageCircle size={18} />
+          )}
         </button>
 
         <button
