@@ -5,10 +5,11 @@ import TypingIndicator from "./TypingIndicator";
 
 interface MessagesListPropsExtended extends MessagesListProps {
   userAvatar?: string;
+  onTextSelection?: (selectedText: string, fullText: string) => void;
 }
 
 const MessagesList = forwardRef<HTMLDivElement, MessagesListPropsExtended>(
-  ({ messages, isTyping, userAvatar }, ref) => {
+  ({ messages, isTyping, userAvatar, onTextSelection }, ref) => {
     return (
       <div className="messages-container">
         {messages.map((message) => (
@@ -16,6 +17,7 @@ const MessagesList = forwardRef<HTMLDivElement, MessagesListPropsExtended>(
             key={message.id}
             message={message}
             userAvatar={userAvatar}
+            onTextSelection={onTextSelection}
           />
         ))}
 

@@ -113,6 +113,17 @@ export default function ChatInterface({
     }
   };
 
+  const handleTextSelection = (selectedText: string, fullText: string) => {
+    console.log("Text selected by user:", selectedText);
+    console.log("From message:", fullText);
+
+    // TODO:add additional logic here, such as:
+    // - Showing a translation tooltip
+    // - Adding to vocabulary list
+    // - Triggering exercises based on selected words
+    // - etc.
+  };
+
   return (
     <div className="chat-container">
       {/* Welcome message if no session */}
@@ -124,6 +135,7 @@ export default function ChatInterface({
           messages={currentSession.messages}
           isTyping={isTyping}
           userAvatar={user.avatar}
+          onTextSelection={handleTextSelection}
           ref={messagesEndRef}
         />
       )}
