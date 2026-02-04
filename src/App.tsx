@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, User as UserIcon, BookOpen, Book } from "lucide-react";
+import {
+  MessageCircle,
+  User as UserIcon,
+  BookOpen,
+  Book,
+  Languages,
+} from "lucide-react";
 import ChatInterface from "./components/chat/ChatInterface";
 import ProfileView from "./components/profile/ProfileView";
 import ExerciseView from "./components/exercise/ExerciseView";
 import VocabularyView from "./components/vocabulary/VocabularyView";
+import TranslationView from "./components/translation/TranslationView";
 import type { User, ChatSession, Exercise, VocabularyWord } from "./types";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -29,7 +36,7 @@ const initialUser: User = {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<
-    "chat" | "profile" | "exercises" | "vocabulary"
+    "chat" | "profile" | "exercises" | "vocabulary" | "translation"
   >("chat");
   const [user, setUser] = useState<User>(() => loadUser() || initialUser);
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(() =>
@@ -199,7 +206,13 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
       </header>
 
       <main
-        className={`main-content ${activeTab === "profile" ? "main-content-compact" : activeTab === "exercises" ? "main-content-compact" : ""}`}
+        className={`main-content ${
+          activeTab === "profile"
+            ? "main-content-compact profile-layout"
+            : ["exercises", "vocabulary", "translation"].includes(activeTab)
+              ? "main-content-compact"
+              : ""
+        }`}
       >
         {activeTab === "chat" && (
           <ChatInterface
@@ -232,6 +245,8 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
             onUpdateWord={handleUpdateVocabularyWord}
           />
         )}
+
+        {activeTab === "translation" && <TranslationView user={user} />}
       </main>
 
       <nav className="bottom-nav">
@@ -255,6 +270,13 @@ Mix different exercise types. Focus on vocabulary and grammar concepts from our 
             icon={Book}
             label="Vocabulary"
             active={activeTab === "vocabulary"}
+            onClick={setActiveTab}
+          />
+          <TabButton
+            id="translation"
+            icon={Languages}
+            label="Translate"
+            active={activeTab === "translation"}
             onClick={setActiveTab}
           />
           <TabButton

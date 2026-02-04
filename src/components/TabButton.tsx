@@ -6,11 +6,13 @@ export const TabButton = ({
   onClick,
   badge,
 }: {
-  id: "chat" | "profile" | "exercises" | "vocabulary";
+  id: "chat" | "profile" | "exercises" | "vocabulary" | "translation";
   icon: React.ComponentType<{ size: number; className?: string }>;
   label: string;
   active: boolean;
-  onClick: (id: "chat" | "profile" | "exercises" | "vocabulary") => void;
+  onClick: (
+    id: "chat" | "profile" | "exercises" | "vocabulary" | "translation",
+  ) => void;
   badge?: number;
 }) => (
   <button
